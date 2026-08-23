@@ -1,0 +1,111 @@
+message_id,action,message_type,reason,confidence,evidence_message_ids
+msg_023,notify,business_update,A verified business is sending an update that matches the user's recent account activity.,0.92,message_0263;message_0243;message_0407
+msg_091,mute,scam,message claims urgent account suspension/expiry and demands action,0.95,message_0238
+msg_090,notify,personal,"The user is being contacted regarding a package mix-up, which is a personal matter that requires their attention.",0.92,none
+msg_048,notify,urgent,The message is an admin notice with a time-sensitive request for payment to avoid access card blockage.,0.88,message_0151
+msg_040,mute,event,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.07 at model confidence 0.71 — group event,0.7107,message_0194;message_0136;message_0078
+msg_075,notify,business_update,A verified business is sending a status update related to the user's recent activity.,0.92,none
+msg_005,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,message_0224
+msg_104,notify,personal,"The message is a personal update about an item being held for the user, with a specific deadline for collection.",0.92,message_0232;message_0231;message_0383
+msg_069,mute,event,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.00 at model confidence 0.78 — group event,0.7836,none
+msg_107,mute,scam,message asks the user to share/confirm an OTP or one-time password,0.95,none
+msg_070,mute,scam,message asks the user to share/confirm an OTP or one-time password,0.95,none
+msg_003,notify,business_update,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — business update,0.7313,message_0031;message_0400;message_0239
+msg_099,notify,personal,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — personal update,0.7538,message_0227
+msg_008,digest,promotion,The message is promotional but matches a topic or business the user has opted into.,0.81,message_0072;message_0071
+msg_092,notify,business_update,A verified business is sending a statement update that the user needs to review,0.92,message_0346
+msg_060,notify,urgent,A trusted faculty advising group sent a time-sensitive reminder about an internship approval deadline.,0.92,message_0176
+msg_004,notify,business_update,A verified business is sending a health-related update that the user needs to review,0.92,message_0245;message_0047;message_0005
+msg_030,mute,event,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.04 at model confidence 0.74 — promotional content,0.7354,message_0115;message_0113;message_0332
+msg_045,notify,urgent,A delivery person is waiting at the gate with a package and needs confirmation within 10 minutes.,0.92,none
+msg_052,mute,scam,unverified business business_064 sent money/urgency text from domain 'talabat-refund.com' not matching a known verified domain,0.9,message_0208;message_0207
+msg_009,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,message_0074
+msg_071,notify,event,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — group event,0.7538,none
+msg_016,mute,scam,sender u_050 has 10 reported messages in history and the text shows a scam signal,0.85,none
+msg_065,digest,promotion,The message is promotional but matches a topic or business the user has opted into and has a history of engagement.,0.81,message_0261
+msg_038,mute,spam,forwarded 10x with generic broadcast/chain phrasing,0.75,message_0131
+msg_086,notify,business_update,A verified business is sending a time-sensitive update related to the user's travel plans.,0.92,message_0222
+msg_014,mute,business_update,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.04 at model confidence 0.63 — promotional content,0.6251,message_0017;message_0305;message_0317
+msg_094,digest,promotion,"The message is promotional but matches a topic or business the user has opted into, specifically beauty products from a verified business Nykaa.",0.81,none
+msg_029,digest,promotion,The message is promotional but matches a topic the user has shown interest in through their group membership and past interactions.,0.81,message_0115;message_0113;message_0332
+msg_105,mute,forward,"The message is a forwarded health tip with a pattern of similar messages in the user's history, indicating low engagement and high dismiss rate.",0.81,message_0233;message_0131;message_0016
+msg_002,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,none
+msg_010,digest,promotion,The message is promotional but from a verified business the user has interacted with recently.,0.81,message_0311;message_0011;message_0242
+msg_078,mute,scam,sender u_049 has 14 reported messages in history and the text shows a scam signal,0.85,none
+msg_013,digest,promotion,The message is promotional but may be of interest due to its local and timely nature.,0.72,none
+msg_018,mute,scam,sender u_050 has 10 reported messages in history and the text shows a scam signal,0.85,none
+msg_044,mute,scam,message asks the user to share/confirm an OTP or one-time password,0.95,none
+msg_032,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,message_0285
+msg_106,notify,personal,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — personal update,0.7313,message_0234
+msg_006,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,message_0029;message_0057
+msg_109,mute,scam,message attempts to override routing instructions (prompt injection),0.95,message_0151
+msg_108,mute,scam,unverified business business_062 sent money/urgency text from domain 'chase-secure-alert.com' not matching a known verified domain,0.9,message_0094;message_0093
+msg_019,mute,scam,unverified business business_062 has 55 user reports in the last 30d,0.8,none
+msg_088,notify,personal,"The sender has set aside an item for the user and is requesting confirmation before offering it to someone else, indicating a time-sensitive personal matter.",0.82,message_0224
+msg_056,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,none
+msg_027,digest,promotion,The message is promotional but matches a topic or business the user has opted into.,0.78,message_0272;message_0033;message_0007
+msg_050,notify,business_update,A healthcare business is sending a personal update that the user is likely to need immediately.,0.92,message_0246;message_0279
+msg_083,notify,event,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — group event,0.7538,message_0219
+msg_063,mute,scam,sender u_049 has 14 reported messages in history and the text shows a scam signal,0.85,none
+msg_033,notify,personal,"A family member is checking in and asking for a call, indicating a personal and potentially important conversation.",0.88,none
+msg_061,mute,event,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.00 at model confidence 0.78 — group event,0.7836,message_0193;message_0135;message_0077
+msg_020,mute,scam,message pairs a URL-shortener link with money/urgency/OTP context,0.9,none
+msg_017,mute,scam,sender u_049 has 14 reported messages in history and the text shows a scam signal,0.85,none
+msg_058,mute,spam,forwarded 10x with generic broadcast/chain phrasing,0.75,message_0194;message_0136;message_0078
+msg_026,mute,scam,unverified business business_036 sent money/urgency text from domain 'amazonpay-delivery.in' not matching a known verified domain,0.9,message_0032;message_0028
+msg_047,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,none
+msg_046,mute,scam,message asks the user to share/confirm an OTP or one-time password,0.95,none
+msg_042,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7327,message_0150
+msg_079,mute,scam,sender u_050 has 10 reported messages in history and the text shows a scam signal,0.85,none
+msg_098,notify,personal,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — personal update,0.7538,message_0367;message_0226
+msg_037,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,none
+msg_007,digest,event,"The message is an update about a community event that the user is likely interested in, given their engagement with the group.",0.92,none
+msg_085,mute,scam,unverified business business_033 has 38 user reports in the last 30d,0.8,message_0221
+msg_001,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7327,message_0057
+msg_021,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,none
+msg_028,digest,promotion,The message is promotional but matches a topic or business the user has opted into and has a history of engagement.,0.81,message_0034;message_0272
+msg_012,mute,event,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.00 at model confidence 0.78 — group event,0.7836,none
+msg_064,mute,scam,sender u_050 has 10 reported messages in history and the text shows a scam signal,0.85,message_0053
+msg_103,notify,personal,user's engagement with this sender is high: priority 0.95 at model confidence 0.70 — personal update,0.7001,message_0232;message_0231;message_0383
+msg_031,notify,event,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — group event,0.7538,none
+msg_057,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,message_0169
+msg_087,mute,event,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.00 at model confidence 0.78 — group event,0.7836,none
+msg_067,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,none
+msg_039,notify,event,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — group event,0.7538,none
+msg_082,notify,event,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — group event,0.7538,message_0218
+msg_066,mute,business_update,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.04 at model confidence 0.63 — promotional content,0.6251,message_0336
+msg_049,notify,business_update,A verified business is sending a time-sensitive update related to a return pickup,0.92,message_0154;message_0291
+msg_015,mute,scam,message asks the user to share/confirm an OTP or one-time password,0.95,none
+msg_051,mute,business_update,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.04 at model confidence 0.63 — promotional content,0.6251,message_0337;message_0356;message_0257
+msg_097,notify,personal,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — personal update,0.7313,message_0366
+msg_089,mute,personal,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.07 at model confidence 0.71 — personal update,0.7107,message_0036
+msg_053,notify,event,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — group event,0.7538,message_0411
+msg_059,mute,scam,The message attempts to trick the user into sharing sensitive information by creating a false sense of urgency.,0.92,none
+msg_024,mute,business_update,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.00 at model confidence 0.67 — promotional content,0.6661,message_0337;message_0356;message_0257
+msg_072,mute,scam,message asks the user to share/confirm an OTP or one-time password,0.95,none
+msg_036,mute,scam,unverified business business_097 sent money/urgency text from domain 'razorpayx-payouts.com' not matching a known verified domain,0.9,message_0283
+msg_076,mute,scam,unverified business business_064 sent money/urgency text from domain 'talabat-refund.com' not matching a known verified domain,0.9,message_0208;message_0207
+msg_055,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,none
+msg_102,notify,personal,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — personal update,0.7313,message_0371;message_0230
+msg_080,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,none
+msg_093,digest,business_update,A verified logistics business is sending a same-day delivery update that the user is likely to need immediately. [personalization: quiet-hours downgrade to digest],0.92,message_0349;message_0348;message_0347
+msg_034,mute,spam,forwarded 11x with generic broadcast/chain phrasing,0.75,message_0013;message_0193
+msg_035,digest,promotion,"The message is promotional but from a verified business, matching a topic the user has engaged with before.",0.81,message_0302;message_0281
+msg_101,digest,personal,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — personal update [personalization: quiet-hours downgrade to digest],0.7313,message_0370;message_0229;message_0268
+msg_041,notify,business_update,user's engagement with this sender is high: priority 1.00 at model confidence 0.60 — business update,0.6031,message_0329;message_0308;message_0287
+msg_011,mute,event,user's engagement with this sender is very low (low-value/repetitive for this user; not unsafe): priority 0.04 at model confidence 0.74 — promotional content,0.7354,message_0193;message_0135;message_0014
+msg_110,mute,scam,sender u_049 has 14 reported messages in history and the text shows a scam signal,0.85,none
+msg_095,mute,scam,message attempts to override routing instructions (prompt injection),0.95,none
+msg_074,mute,scam,sender u_052 has 9 reported messages in history and the text shows a scam signal,0.85,message_0301
+msg_073,mute,scam,sender u_050 has 10 reported messages in history and the text shows a scam signal,0.85,none
+msg_054,mute,scam,sender u_052 has 9 reported messages in history and the text shows a scam signal,0.85,none
+msg_068,notify,event,user's engagement with this sender is high: priority 0.98 at model confidence 0.73 — group event,0.7313,none
+msg_100,notify,personal,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — personal update,0.7538,message_0228;message_0362;message_0371
+msg_062,digest,event,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — group event [personalization: quiet-hours downgrade to digest],0.7538,message_0043
+msg_096,notify,personal,A personal message about a found item that requires immediate attention from the user.,0.92,none
+msg_043,notify,urgent,A trusted group admin sent a time-sensitive update that should interrupt the user.,0.92,none
+msg_077,digest,event,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — group event [personalization: quiet-hours downgrade to digest],0.7538,none
+msg_081,notify,event,A school admin sent a same-day operational update that the user is likely to need immediately.,0.87,message_0255
+msg_025,notify,business_update,user's engagement with this sender is high: priority 1.00 at model confidence 0.75 — business update,0.7538,message_0031;message_0400;message_0239
+msg_084,digest,promotion,"The message is promotional but matches a topic or business the user has opted into, specifically a partnership with a verified business HDFC Bank.",0.81,none
+msg_022,notify,payment,"A payment due today was sent by the society maintenance desk, requiring immediate attention from the user.",0.92,none
