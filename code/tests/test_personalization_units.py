@@ -148,6 +148,27 @@ class TestMutedGroupMention:
         result = P.apply(_decision("mute", "spam"), _user(), _member(), _msg(text="@u_099 hello"))
         assert result.action == "mute"
 
+    def test_longer_id_sharing_prefix_is_not_escalation(self) -> None:
+        result = P.apply(_decision("mute", "spam"), _user(), _member(), _msg(text="@u_0012 hello"))
+        assert result.action == "mute"
+        assert result.personalized is False
+
+    def test_mention_followed_by_punctuation_is_escalation(self) -> None:
+        result = P.apply(_decision("mute", "spam"), _user(), _member(), _msg(text="hey @u_001, check"))
+        assert result.action == "digest"
+
+    def test_mention_at_end_of_text_is_escalation(self) -> None:
+        result = P.apply(_decision("mute", "spam"), _user(), _member(), _msg(text="ping @u_001"))
+        assert result.action == "digest"
+
+    def test_mention_inside_email_is_not_escalation(self) -> None:
+        result = P.apply(_decision("mute", "spam"), _user(), _member(), _msg(text="mail bob@u_001.com"))
+        assert result.action == "mute"
+
+    def test_plain_at_without_id_is_not_escalation(self) -> None:
+        result = P.apply(_decision("mute", "spam"), _user(), _member(), _msg(text="meet me @ 5pm"))
+        assert result.action == "mute"
+
 
 class TestSafetyInvariant:
     def test_rule_scam_mute_never_touched(self) -> None:

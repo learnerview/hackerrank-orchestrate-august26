@@ -5,6 +5,16 @@ challenge. For every incoming multimodal message (`dataset/messages.csv`) the
 system decides `notify` (interrupt now), `digest` (batch later), or `mute`
 (low-value, repetitive, unwanted, suspicious, or unsafe).
 
+> Project-level documentation lives at the repository root:
+> [`../README.md`](../README.md), [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md),
+> [`../docs/CONFIGURATION.md`](../docs/CONFIGURATION.md),
+> [`../docs/DEPLOYMENT.md`](../docs/DEPLOYMENT.md),
+> [`../docs/PRODUCTION_READINESS.md`](../docs/PRODUCTION_READINESS.md),
+> [`../SECURITY.md`](../SECURITY.md). This file is the code-level guide.
+>
+> `python -m pytest` in this directory: **135 passed** (2026-10-16). The system is a
+> hackathon submission — not production-hardened.
+
 ## Setup
 
 ```powershell
@@ -79,7 +89,7 @@ python -m evaluation.evaluate
 - Live routing is served from the on-disk caches (`artifacts/llm_cache`,
   `.cache/media`) on re-runs, so re-evaluating is cheap.
 
-## Architecture (matches spec section 1)
+## Architecture (matches `SRS.md` §3, extended by `docs/ARCHITECTURE.md`)
 
 The system is a decision **cascade** of three stages, each with a single
 responsibility and a Protocol interface, wired by the composition root in

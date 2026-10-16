@@ -238,6 +238,40 @@ def test_verified_business_never_fires():
     assert hit is None
 
 
+def test_domain_match_is_case_insensitive():
+    # DNS names are case-insensitive: a sender domain that differs from the
+    # official domain only by case is the SAME domain and must not be treated
+    # as impersonation (no false-positive mute).
+    biz = _business(
+        business_id="b_case",
+        verified=False,
+        official_domain="PhonePe.COM",
+        sender_domain="phonepe.com",
+        reports30d=0,
+    )
+    hit = SafetyRuleEngine(_repo([biz], [], [])).evaluate(
+        _msg(business_id="b_case", text="Your payment of Rs 1999 failed. Update UPI details urgently")
+    )
+    assert hit is None
+
+
+def test_verified_domain_allowlist_is_case_insensitive():
+    # A verified business's domain is a known-good domain; an unverified sender
+    # using the same domain in a different case must be recognized as known-good.
+    official = _business(
+        business_id="b_official", verified=True, official_domain="brand.com",
+        sender_domain="brand.com", reports30d=0,
+    )
+    imposter = _business(
+        business_id="b_imposter", verified=False, official_domain="other.com",
+        sender_domain="BRAND.com", reports30d=0,
+    )
+    hit = SafetyRuleEngine(_repo([official, imposter], [], [])).evaluate(
+        _msg(business_id="b_imposter", text="Your payment failed. Update UPI urgently")
+    )
+    assert hit is None
+
+
 def test_forwarded_safe_never_fires():
     # fwd=6 "share blessings" is labeled greeting in the sample set -> no fire
     assert _engine().evaluate(_msg(text="Good morning all. Share blessings.", forwarded_count=6)) is None

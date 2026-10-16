@@ -165,6 +165,57 @@ def test_resilient_image_retries_internal_server_error_then_falls_back(tmp_path)
     assert wrapper.fallback_calls == 1
 
 
+def _internal_server_error():
+    request = httpx.Request("POST", "https://api.groq.com/openai/v1/chat/completions")
+    response = httpx.Response(503, request=request)
+    from groq import InternalServerError
+
+    return InternalServerError("over capacity", response=response, body={})
+
+
+def test_groq_vision_reraises_internal_server_error(tmp_path):
+    # The analyzer must propagate provider availability errors (incl. 5xx)
+    # UNCHANGED so the resilient wrapper can retry/fall back. It must NOT wrap
+    # them into MediaAnalysisError, which would defeat the fallback.
+    from groq import InternalServerError
+    from media.groq_vision_analyzer import GroqVisionAnalyzer
+
+    class _Completions:
+        def create(self, **_kwargs):
+            raise _internal_server_error()
+
+    class _Chat:
+        completions = _Completions()
+
+    class _Client:
+        chat = _Chat()
+
+    path = tmp_path / "img.jpg"
+    path.write_bytes(b"img")
+    with pytest.raises(InternalServerError):
+        GroqVisionAnalyzer(_Client()).analyze(str(path))
+
+
+def test_groq_whisper_reraises_internal_server_error(tmp_path):
+    from groq import InternalServerError
+    from media.groq_whisper_transcriber import GroqWhisperTranscriber
+
+    class _Transcriptions:
+        def create(self, **_kwargs):
+            raise _internal_server_error()
+
+    class _Audio:
+        transcriptions = _Transcriptions()
+
+    class _Client:
+        audio = _Audio()
+
+    path = tmp_path / "a.mp3"
+    path.write_bytes(b"audio")
+    with pytest.raises(InternalServerError):
+        GroqWhisperTranscriber(_Client()).transcribe(str(path))
+
+
 def test_rate_limiter_enforces_rpm():
     # capacity starts full (60 tokens for 60 rpm); drain it, then the next
     # token must wait ~1s for the refill rate of 1 token/sec.

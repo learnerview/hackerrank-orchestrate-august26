@@ -110,8 +110,8 @@ class PipelineRunner:
             user=self._repo.get_user(message.user_id),
             group=self._repo.get_group(message.group_id) if message.group_id else None,
             member=(
-                self._repo.get_group_member(message.user_id, message.sender_user_id)
-                if message.sender_user_id
+                self._repo.get_group_member(message.user_id, message.group_id)
+                if message.group_id
                 else None
             ),
             business=self._repo.get_business(message.business_id) if message.business_id else None,

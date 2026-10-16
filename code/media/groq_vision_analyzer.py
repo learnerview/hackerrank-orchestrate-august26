@@ -18,7 +18,7 @@ import json
 from typing import Any, Optional
 
 from groq import Groq
-from groq import APIConnectionError, AuthenticationError, RateLimitError
+from groq import APIConnectionError, AuthenticationError, InternalServerError, RateLimitError
 
 from models import MediaAnalysisResult
 from .interfaces import ImageAnalyzer, MediaAnalysisError
@@ -71,7 +71,7 @@ class GroqVisionAnalyzer(ImageAnalyzer):
                     }
                 ],
             )
-        except (RateLimitError, AuthenticationError, APIConnectionError):
+        except (RateLimitError, AuthenticationError, APIConnectionError, InternalServerError):
             raise
         except Exception as exc:
             raise MediaAnalysisError(f"Groq vision call failed for {image_path}: {exc}") from exc
