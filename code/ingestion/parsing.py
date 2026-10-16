@@ -7,10 +7,38 @@ to typed value coercion with explicit error messages.
 
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from typing import Optional
 
 TimestampFormats = ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%SZ")
+
+#: A mention is ``@`` preceded by a delimiter (start of string or any
+#: non-word character, so an email local part like ``foo@bar.com`` never
+#: counts) followed by an id of word characters. The id ends at the first
+#: non-word character, so ``@sam123`` and ``@sam`` are distinct mentions.
+_MENTION_RE = re.compile(r"(?<![A-Za-z0-9_])@([A-Za-z0-9_]+)")
+
+
+def mentioned_user_ids(text: str) -> list[str]:
+    """The user ids @-mentioned in ``text`` as complete tokens.
+
+    Each ``@`` must sit on a delimiter (start of string or a non-word
+    character) and the id runs until the next non-word character — so
+    ``@sam123`` does not mention ``sam``, and ``@sam,``/``@sam.``/``@sam``
+    all mention ``sam``. Returns ids in order of appearance (duplicates
+    preserved so callers can count them).
+    """
+    if not text:
+        return []
+    return _MENTION_RE.findall(text)
+
+
+def mentions_user(text: str, user_id: str) -> bool:
+    """True if ``text`` @-mentions ``user_id`` as a complete token."""
+    if not text or not user_id:
+        return False
+    return user_id in mentioned_user_ids(text)
 
 
 def parse_timestamp(value: str) -> Optional[datetime]:
@@ -33,6 +61,17 @@ def parse_timestamp(value: str) -> Optional[datetime]:
 def opt_str(value: str) -> Optional[str]:
     """Optional string field: empty cell -> None."""
     return None if value == "" else value
+
+
+def normalize_domain(value: str) -> Optional[str]:
+    """Optional domain field: empty cell -> None, else lowercased.
+
+    DNS names are case-insensitive, so domains must be normalized before they
+    are compared. Strips surrounding whitespace and any trailing root dot
+    (``Example.COM.`` -> ``example.com``). Returns None when nothing remains.
+    """
+    domain = value.strip().lower().rstrip(".")
+    return domain or None
 
 
 def req_str(value: str, field: str, path: str, row: int) -> str:

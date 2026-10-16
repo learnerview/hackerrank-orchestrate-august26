@@ -16,7 +16,7 @@ import re
 from datetime import datetime
 from typing import Optional
 
-from ingestion.parsing import parse_timestamp
+from ingestion.parsing import mentions_user, parse_timestamp
 from ingestion.repository import DataRepository
 from models import IncomingMessage
 
@@ -49,7 +49,6 @@ FEATURE_NAMES: tuple[str, ...] = (
     "promo_signal",       # 0-1: how promotional/greeting the MESSAGE content is
 )
 
-_MENTION_RE = re.compile(r"@\w+")
 _DND_RE = re.compile(r"(\d{1,2}):\d{2}\s*-\s*(\d{1,2}):\d{2}")
 
 #: Keyword/pattern families that mark a message as promotional, greeting
@@ -251,9 +250,7 @@ class FeatureExtractor:
         return 1.0 if member is not None and member.group_muted_by_user else 0.0
 
     def _at_mention(self, message: IncomingMessage) -> float:
-        if f"@{message.user_id}" in message.message_text:
-            return 1.0
-        return 1.0 if _MENTION_RE.search(message.message_text) else 0.0
+        return 1.0 if mentions_user(message.message_text or "", message.user_id) else 0.0
 
     # ------------------------------------------------------------------ #
     # public API

@@ -96,7 +96,7 @@ def context_summary(repo, fx, message) -> str:
     if u:
         lines.append(f"user: {u.user_id}, dnd_window={u.do_not_disturb_window!r}, "
                      f"opened_30d={u.messages_opened_30d}, reported_30d={u.messages_reported_30d}")
-    gm = repo.get_group_member(message.user_id, message.sender_user_id) if message.sender_user_id else None
+    gm = repo.get_group_member(message.user_id, message.group_id) if message.group_id else None
     g = repo.get_group(message.group_id) if message.group_id else None
     if g:
         lines.append(f"group: {g.group_name} ({g.group_type}, {g.member_count} members)")

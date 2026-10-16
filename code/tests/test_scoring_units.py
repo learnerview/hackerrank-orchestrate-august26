@@ -18,6 +18,7 @@ from models import (  # noqa: E402
     MessageEvent,
     UserProfile,
 )
+from ingestion.parsing import mentioned_user_ids, mentions_user  # noqa: E402
 from ingestion.repository import InMemoryDataRepository  # noqa: E402
 from scoring.features import (  # noqa: E402
     FeatureExtractor,
@@ -129,6 +130,53 @@ def test_features_include_message_level_signals():
     assert feats["is_night"] == 1.0
     assert feats["is_morning"] == 0.0
     assert feats["is_business"] == 0.0
+
+
+def test_mentioned_user_ids_parses_complete_tokens():
+    # a complete id ends at the first non-word character (punctuation/space/end)
+    assert mentioned_user_ids("@u_001 check this") == ["u_001"]
+    assert mentioned_user_ids("ping @u_001, later") == ["u_001"]
+    assert mentioned_user_ids("@u_001.") == ["u_001"]
+    assert mentioned_user_ids("hey @u_001") == ["u_001"]
+    # no prefix bleed: @sam123 is not a mention of sam
+    assert mentioned_user_ids("@sam123") == ["sam123"]
+    assert mentioned_user_ids("@sam") == ["sam"]
+    # an email local part is not a mention (the @ is not on a delimiter)
+    assert mentioned_user_ids("mail me at foo@bar.com") == []
+    # ordinary text containing @ with no id
+    assert mentioned_user_ids("meet me @ 5pm") == []
+    assert mentioned_user_ids("") == []
+    assert mentioned_user_ids("a@b @c") == ["c"]
+    assert mentioned_user_ids("@a @a") == ["a", "a"]
+
+
+def test_mentions_user_requires_exact_id():
+    assert mentions_user("@u_001 hi", "u_001") is True
+    assert mentions_user("@u_001, hi", "u_001") is True
+    assert mentions_user("hi @u_001", "u_001") is True
+    # longer id sharing the prefix must NOT count
+    assert mentions_user("@u_0012 hi", "u_001") is False
+    assert mentions_user("@u_001abc hi", "u_001") is False
+    # a different user is not a match
+    assert mentions_user("@u_099 hi", "u_001") is False
+    # an email / plain @ is not a mention
+    assert mentions_user("bob@u_001.com", "u_001") is False
+    assert mentions_user("meet @ 5pm", "u_001") is False
+    assert mentions_user("", "u_001") is False
+    assert mentions_user("@u_001", "") is False
+
+
+def test_at_mention_counts_only_the_receiving_user():
+    repo = _repo([], [])
+    fx = FeatureExtractor(repo)
+    assert fx.extract(_msg(text="@u1 check this"))["at_mention"] == 1.0
+    assert fx.extract(_msg(text="ping @u1, please"))["at_mention"] == 1.0
+    assert fx.extract(_msg(text="@u1"))["at_mention"] == 1.0
+    # a longer id sharing the prefix, another user, or plain @ -> no mention
+    assert fx.extract(_msg(text="@u12 check this"))["at_mention"] == 0.0
+    assert fx.extract(_msg(text="@u2 check this"))["at_mention"] == 0.0
+    assert fx.extract(_msg(text="meet me @ 5pm"))["at_mention"] == 0.0
+    assert fx.extract(_msg(text="mail me at bob@u1.com"))["at_mention"] == 0.0
 
 
 def test_sender_role_and_group_muted_from_members():

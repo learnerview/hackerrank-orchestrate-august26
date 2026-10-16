@@ -37,7 +37,7 @@ from models import (
     UserProfile,
     VoiceNoteRecord,
 )
-from .parsing import bool_field, float_field, int_field, opt_str, req_str
+from .parsing import bool_field, float_field, int_field, normalize_domain, opt_str, req_str
 
 MESSAGES_HEADERS = [
     "message_id",
@@ -259,8 +259,8 @@ def load_business_accounts(path: str) -> list[BusinessContext]:
             brand_name=req_str(row["brand_name"], "brand_name", path, i),
             category=req_str(row["category"], "category", path, i),
             verified=bool_field(row.get("verified", ""), "verified", path, i),
-            official_domain=opt_str(row.get("official_domain", "")),
-            domain_used_by_sender=opt_str(row.get("domain_used_by_sender", "")),
+            official_domain=normalize_domain(row.get("official_domain", "")),
+            domain_used_by_sender=normalize_domain(row.get("domain_used_by_sender", "")),
             account_age_days=int_field(row.get("account_age_days", ""), "account_age_days", path, i),
             messages_sent_30d=int_field(row.get("messages_sent_30d", ""), "messages_sent_30d", path, i),
             user_reports_30d=int_field(row.get("user_reports_30d", ""), "user_reports_30d", path, i),
