@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from typing import Callable, Optional
 
 from models import BusinessContext, IncomingMessage, RuleHit
+from ingestion.parsing import normalize_domain
 from ingestion.repository import DataRepository
 
 # --------------------------------------------------------------------------- #
@@ -127,10 +128,10 @@ def business_domain_scam_rule(message: IncomingMessage, ctx: RuleContext) -> Opt
     if not _DOMAIN_MONEY_RE.search(message.message_text):
         return None
 
-    sender_domain = ctx.business.domain_used_by_sender or ""
+    sender_domain = normalize_domain(ctx.business.domain_used_by_sender or "")
     if not sender_domain:
         return None  # no domain data -> stay silent (conservative)
-    official = ctx.business.official_domain or ""
+    official = normalize_domain(ctx.business.official_domain or "")
     if sender_domain in ctx.known_good_domains:
         return None
     if official and sender_domain == official:
@@ -344,7 +345,10 @@ class SafetyRuleEngine:
             domain
             for b in self._repo.all_businesses()
             if b.verified
-            for domain in (b.official_domain, b.domain_used_by_sender)
+            for domain in (
+                normalize_domain(b.official_domain or ""),
+                normalize_domain(b.domain_used_by_sender or ""),
+            )
             if domain
         )
 

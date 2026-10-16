@@ -28,7 +28,7 @@ import re
 from dataclasses import replace
 from typing import Optional
 
-from ingestion.parsing import parse_timestamp
+from ingestion.parsing import mentions_user, parse_timestamp
 from models.decision import RoutingDecision
 from models.group import GroupMemberContext
 from models.message import IncomingMessage
@@ -49,8 +49,7 @@ def _is_rule_engine_mute(decision: RoutingDecision) -> bool:
 
 def _mentions_user(message: IncomingMessage) -> bool:
     """True if the message @-mentions the receiving user directly."""
-    text = message.message_text or ""
-    return f"@{message.user_id}" in text
+    return mentions_user(message.message_text or "", message.user_id)
 
 
 def _has_urgency_signal(member: Optional[GroupMemberContext], message: IncomingMessage) -> bool:

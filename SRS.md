@@ -3,9 +3,11 @@
 ### HackerRank Orchestrate — August 2026
 
 **Author:** Sumit Shukla
-**Status:** Pre-implementation planning document — this is the single source of truth for
-development. Section 12 (Evaluation Results) is a template to be filled in with real numbers
-after the system is built and run; every other section describes locked design decisions.
+**Status:** Originally a pre-implementation planning document. Sections 1–11 and 13–16 are
+preserved as the **original specification**. The system has since been implemented in
+`code/`; several design decisions changed during the build. **§17 (Implementation Status &
+Reconciliation) is authoritative where it differs from the original text**, and stale passages
+below carry inline "Implemented:" notes. §12 now carries the real post-implementation numbers.
 
 ---
 
@@ -22,11 +24,12 @@ after the system is built and run; every other section describes locked design d
 9. LLM Integration
 10. Personalization & Override Logic
 11. Safety & Scam Handling
-12. Evaluation Methodology & ResultsA
+12. Evaluation Methodology & Results
 13. Determinism & Reproducibility
 14. Limitations
 15. Future Work
 16. Appendices
+17. Implementation Status & Reconciliation (authoritative where it differs)
 
 ---
 
@@ -182,6 +185,11 @@ message_id,action,message_type,reason,confidence,evidence_message_ids
 actual files at build time (opencode Prompt 2) rather than assumed here — if any discrepancy from
 this document is found, it should be logged and this section updated, not silently worked around.
 
+> **Implemented:** headers were confirmed at build time; the loaders validate every header and
+> parse strictly (`code/ingestion/loaders.py`, `code/ingestion/parsing.py`, smoke-tested in
+> `code/tests/test_smoke.py`). The input schema in this section matches the dataset. Domains are
+> now normalized case-insensitively (`normalize_domain`, `code/ingestion/parsing.py:66`).
+
 ---
 
 ## 5. Decision Cascade — Design & Rationale
@@ -239,6 +247,12 @@ Two content types beyond plain text must be understood before routing:
   Qwen vision) to extract both the literal text (OCR) and a visual-intent summary (e.g. "sale
   poster," "payment QR code," "official notice screenshot") in a single call, which is cheaper
   and more useful than a separate OCR step followed by a separate reasoning step.
+
+  > **Implemented:** the wired vision model is **`qwen/qwen3.6-27b`**, taken from
+  > `GROQ_MODEL_VISION` (`code/config.py:59`, `code/.env.example`) and passed by
+  > `code/media/factory.py:32`. The class-level default
+  > (`llama-4-scout-17b-16e-instruct`, `code/media/groq_vision_analyzer.py:39`) is only a
+  > fallback for direct construction and is not used by the production composition root.
 - **Voice notes** — handled by `media/groq_whisper_transcriber.py`, using Groq's Whisper Large v3
   Turbo endpoint (OpenAI-compatible, ~228× real-time, generous free-tier daily allowance).
 
@@ -308,6 +322,15 @@ and its feature schema are persisted to an `artifacts/` directory. If historical
 sparse for a stable fit (a real risk given hackathon-scale data), the design explicitly permits
 falling back to a simpler weighted-heuristic engagement score rather than shipping an unstable
 model — this is a documented decision point, not a silent failure mode.
+
+> **Implemented (differs from spec):** the shipped classifier is a
+> **`GradientBoostingClassifier`** (`code/scoring/train_preference_model.py:180`), not logistic
+> regression. `build_preference_model` selects the runtime implementation from the schema's
+> `model` field (`code/scoring/preference_model.py:237`); the committed artifact is
+> `"model": "gradient_boosting"` (`code/artifacts/preference_schema.json`). The sparse-data
+> fallback is the **weighted-engagement-rate heuristic**, `HeuristicPreferenceModel`
+> (`code/scoring/preference_model.py:147`) — not a "simpler logistic-regression model". Training
+> also persists an isotonic calibrator and a learned mute band. Full details in §17.
 
 ### 8.4 "Learns and responds as it grows" — the honest version
 
@@ -395,22 +418,37 @@ can express lower confidence rather than a hard mute).
 - Stage-resolution breakdown — what fraction of decisions were resolved by rules vs. the
   preference model vs. the LLM fallback, which doubles as a cost/latency health metric.
 
-### Results — *to be filled in after the system is built and run*
+### Results — measured post-implementation
+
+Real output of `python -m evaluation.evaluate` (from `code/`, 2026-10-16) over the 30
+labeled rows in `dataset/sample_messages.csv`. The samples are disjoint from
+`messages.csv`, so the evaluator routes them through the production pipeline; re-runs are
+served from the on-disk caches.
 
 | Metric | Value |
 |---|---|
-| Action accuracy | *pending* |
-| Message-type accuracy | *pending* |
-| Evidence overlap rate | *pending* |
-| Mean confidence (correct predictions) | *pending* |
-| Mean confidence (incorrect predictions) | *pending* |
-| % resolved by rule engine | *pending* |
-| % resolved by preference model | *pending* |
-| % resolved by LLM fallback | *pending* |
-| Full-dataset runtime | *pending* |
+| Action accuracy | 0.733 (22/30) |
+| Message-type accuracy | 0.400 (12/30) |
+| Evidence overlap rate (mean Jaccard; 28 samples with expected ids) | 0.12 |
+| Pearson(confidence, correctness) | +0.058 |
+| Calibration — conf 0.50–0.60 | acc 75%, n=4 |
+| Calibration — conf 0.60–0.70 | acc 100%, n=3 |
+| Calibration — conf 0.70–0.80 | acc 60%, n=15 |
+| Calibration — conf 0.80–0.90 | acc 100%, n=2 |
+| Calibration — conf 0.90–1.00 | acc 83%, n=6 |
+| % resolved by rule engine | 20% (6/30), action accuracy 100% |
+| % resolved by preference model | 50% (15/30), action accuracy 67% |
+| % resolved by LLM fallback | 30% (9/30), action accuracy 67% |
+| Full-dataset runtime | reported by `main.py` per run (not captured here) |
 
-*(Copy the actual numbers from opencode Prompt 10's output into this table once the pipeline has
-been run — do not regenerate this document to fill it in.)*
+**Interpretation:** action routing is reasonable (73%); **message-type classification is
+weak (40%)** and confidence is poorly calibrated (Pearson +0.058). Rule-engine decisions
+are perfectly precise on the small sample; the preference-model and LLM stages each carry
+the errors. The sample is only 30 rows, so treat these numbers as indicative.
+
+*(The original planning note said to paste Prompt 10's output here; this table instead
+records a measured run of the implemented code. `docs/PRODUCTION_READINESS.md` scores the
+implications honestly.)*
 
 ---
 
@@ -469,8 +507,9 @@ Given these, two runs of `main.py` against an unchanged `dataset/` should produc
 ## 16. Appendices
 
 ### A. Full input schema reference
-See §4 — to be cross-checked against actual CSV headers at build time (opencode Prompt 2) and
-this section amended if any discrepancy is found.
+See §4 — cross-checked against actual CSV headers at build time. The loaders validate headers
+and parse strictly (`code/ingestion/loaders.py`, `code/ingestion/parsing.py`); `tests/test_smoke.py`
+verifies row counts and joins. No discrepancy was found.
 
 ### B. Prompt templates
 LLM few-shot prompt structure and rule-engine rule definitions are maintained as versioned code
@@ -478,5 +517,55 @@ in `llm/prompt_builder.py` and `safety/rule_engine.py` respectively — referenc
 duplicated, so this document never drifts out of sync with the actual implementation.
 
 ### C. Sample input/output pairs
-To be populated from `dataset/sample_messages.csv` alongside the corresponding generated rows,
-once the pipeline has run (§12).
+`dataset/sample_messages.csv` (30 labeled rows) and `dataset/output.csv` (the generated
+predictions) are the concrete input/output pair. `evaluation/evaluate.py` compares them
+(§12). The generated rows can be inspected directly with `tests/peek_output.py`.
+
+---
+
+## 17. Implementation Status & Reconciliation
+
+This section reconciles the original pre-implementation specification with the code that
+now exists in `code/`. **Where this section and an earlier section disagree, this section
+and the code are authoritative.** The original problem statement is preserved (see
+[`problem_statement.md`](problem_statement.md)) and nothing above was deleted.
+
+### 17.1 Stale facts corrected
+
+| # | Original spec said | Implemented reality | Evidence |
+|---|---|---|---|
+| 1 | §8.3: default classifier is **logistic regression**, gradient boosting as a fallback | Ships a **`GradientBoostingClassifier`**; the fallback is the **weighted-engagement-rate heuristic** (`HeuristicPreferenceModel`), not logistic regression | `code/scoring/train_preference_model.py:180`, `code/scoring/preference_model.py:147,246`, `code/artifacts/preference_schema.json` (`"model":"gradient_boosting"`) |
+| 2 | §6: vision model examples "Llama 4 Scout/Maverick or Qwen vision" | Wired vision model is **`qwen/qwen3.6-27b`** (`GROQ_MODEL_VISION`) | `code/config.py:59`, `code/.env.example`, `code/media/factory.py:32` |
+| 3 | §12: Results "**pending**" / a template | Filled with measured numbers (action 73.3%, type 40.0%, evidence Jaccard 0.12, Pearson +0.058) | `python -m evaluation.evaluate`, see §12 |
+| 4 | §4/§16.A: CSV headers "**to be confirmed at build time**" | Confirmed; strict header validation in the loaders, smoke-tested | `code/ingestion/loaders.py`, `code/ingestion/parsing.py`, `code/tests/test_smoke.py` |
+| 5 | §3 layer list: `models, ingestion, media, retrieval, safety, scoring, llm, orchestration, personalization, output, evaluation` | Adds a **`context/`** layer (per-message context dict) plus `tools/` | `code/context/context_builder.py`, `code/tools/` |
+| 6 | §8.3: persists "fitted model and its feature schema" | Also persists an **isotonic calibrator** and a **learned mute band**; plus `preference_metrics.json` | `code/scoring/train_preference_model.py:218,276-302` |
+| 7 | Naming `scoring/train_preference_model.py` (file path) | Invoked as a module: `python -m scoring.train_preference_model` | `code/scoring/train_preference_model.py:306` |
+| 8 | §9: text model "recommended default: Llama 3.3 70B" | Exact string is **`llama-3.3-70b-versatile`** | `code/config.py:57`, `code/.env.example` |
+| 9 | §10: mentions "**per-user sensitivity**" as an implemented override | Implemented overrides are **quiet-hours downgrade** and **muted-group mention escalation** only; no separate per-user sensitivity knob | `code/personalization/overrides.py:77-142` |
+| 10 | §8.2/§10: "directly `@mentions` the user" (ambiguous) | Mentions are parsed at **token boundaries** via shared helpers, so `@sam123` does not match `sam` | `code/ingestion/parsing.py:23,37`; `code/personalization/overrides.py:52`; `code/scoring/features.py:253` |
+| 11 | §11: domain/identity comparisons (implied literal) | Domains are compared **case-insensitively** after `normalize_domain` (trim + lowercase + strip root dot) in both loaders and the rule engine | `code/ingestion/parsing.py:66`; `code/safety/rule_engine.py:29,131,134,348` |
+| 12 | §6: media "local fallback activates on rate-limit or auth error" | Broadened to any **provider-availability** error, including transient **5xx `InternalServerError`**; retries with backoff first | `code/media/resilient.py:34-39,61-74`; `code/media/groq_vision_analyzer.py:74`; `code/media/groq_whisper_transcriber.py:56` |
+| 13 | §13: "byte-identical `output.csv`" claim | Holds given unchanged input **and warm caches**; a cold clone depends on live provider availability/version because caches are git-ignored | `code/media/cache.py`, `code/llm/cache.py`, `.gitignore` |
+
+### 17.2 Config keys as implemented
+
+`code/config.py` defines settings whose keys/defaults are listed in
+[`docs/CONFIGURATION.md`](docs/CONFIGURATION.md). Two keys are currently **inert**:
+`LOG_LEVEL` is read into `Settings` but never wired to `logging.basicConfig`, and
+`PREFERENCE_MODEL_FALLBACK_THRESHOLD` is read by no code path.
+
+### 17.3 Requirement status (§ by §)
+
+| SRS area | Status |
+|---|---|
+| §5 decision cascade (4 stages) | Implemented as specified; stage order and safety-first invariant hold (`code/orchestration/router.py`) |
+| §6 media pipeline | Implemented (Groq vision/ASR + local fallback, disk cache, rate limiter); see corrected model names |
+| §7 retrieval | Implemented (TF-IDF, sender→group→business scoping, recency decay, top-k) (`code/retrieval/tfidf_retriever.py`) |
+| §8 preference model | Implemented with the corrected classifier/fallback; trained artifact committed under `code/artifacts/` |
+| §9 LLM integration | Implemented (Groq, JSON response mode, temperature 0, single corrective retry, content-hash cache) (`code/llm/groq_client.py`) |
+| §10 personalization | Implemented as quiet-hours + muted-group mention escalation (per-user sensitivity not implemented) |
+| §11 safety rules | Implemented as 10 deterministic rules with fixed confidences, highest-confidence hit wins (`code/safety/rule_engine.py`) |
+| §12 evaluation | Implemented and populated with measured numbers |
+| §13 determinism | Implemented (temperature 0, caches, seeded offline training) |
+| §14 limitations, §15 future work | Still accurate; extended by `README.md` and `docs/PRODUCTION_READINESS.md` |

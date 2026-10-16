@@ -254,3 +254,19 @@ Before responding to any user message, confirm:
 - [ ] I will append a §5.2 entry after this turn.
 - [ ] I will not log secrets.
 - [ ] I will preserve the output contract in §6.
+
+---
+
+## 9. Project Documentation Pointers
+
+These files describe the implemented system and do not override §2 (logging) or §6
+(the output contract):
+
+- `README.md` — project overview, quick start, configuration, testing, limitations.
+- `docs/ARCHITECTURE.md` — layers, decision cascade, data flow, behavior changes.
+- `docs/CONFIGURATION.md` — every environment variable and cascade constant.
+- `docs/DEPLOYMENT.md` — runbook, artifacts, degraded/offline behavior.
+- `docs/PRODUCTION_READINESS.md` — honest /10 readiness assessment.
+- `SECURITY.md` — API-key handling and security posture.
+- `SRS.md` — original engineering spec plus §17 implementation reconciliation.
+- `code/README.md` — code-level setup, training, running, evaluation.

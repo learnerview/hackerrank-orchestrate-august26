@@ -16,7 +16,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from groq import Groq
-from groq import APIConnectionError, AuthenticationError, RateLimitError
+from groq import APIConnectionError, AuthenticationError, InternalServerError, RateLimitError
 
 from models import TranscriptionResult
 from .interfaces import AudioTranscriber, MediaAnalysisError
@@ -53,7 +53,7 @@ class GroqWhisperTranscriber(AudioTranscriber):
                 file=(audio_path, audio_file, "audio/mpeg"),
                 temperature=self._temperature,
             )
-        except (RateLimitError, AuthenticationError, APIConnectionError):
+        except (RateLimitError, AuthenticationError, APIConnectionError, InternalServerError):
             raise
         except Exception as exc:
             raise MediaAnalysisError(f"Groq ASR call failed for {audio_path}: {exc}") from exc

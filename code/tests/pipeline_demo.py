@@ -111,7 +111,7 @@ def main() -> None:
             routed=routed,
             user=repo.get_user(m.user_id),
             group=repo.get_group(m.group_id) if m.group_id else None,
-            member=repo.get_group_member(m.user_id, m.sender_user_id) if m.sender_user_id else None,
+            member=repo.get_group_member(m.user_id, m.group_id) if m.group_id else None,
             business=repo.get_business(m.business_id) if m.business_id else None,
             evidence=evidence,
             engagement_features=fx.extract(m),
